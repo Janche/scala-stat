@@ -33,18 +33,29 @@ object GameController {
     import sparkSession.implicits._ //隐式转换
     val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre" + date)
 
-    val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]
-    .map(data => {
+    val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]  // 此处需要隐式转换
+    .mapPartitions(partition => {
+      partition.map(data => {
         // val format = new SimpleDateFormat("yyyymmdd") // 多次创建效率低，放在外面有线程安全问题
         // val dateStr: String = format.format(new Date(data.timestamp))
         val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
         IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
           data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
       })
+    })
+   //    使用map的方式
+    //      {
+    //        val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
+    //        IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
+    //          data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
+    //      }
 
-    h5LogDs.persist() //隐式转换
+    h5LogDs.persist()
+    // 日新增
     doNuCount(sparkSession, h5LogDs)
+    // 日活跃
 
+    h5LogDs.unpersist()
     sparkSession.close()
   }
 

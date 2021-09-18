@@ -98,8 +98,8 @@ object Constant {
   val INDE_H5_AD: String = "inde_h5_ad"
   val BOX_H5_AD: String = "box_h5_ad"
   val INDE_H5_DAT: String = "inde_h5_dat"
-  var sparkContext: JavaSparkContext = null
-  var sparkSession: SparkSession = null
+  val sparkContext: JavaSparkContext = null
+  val sparkSession: SparkSession = null
   var logRootAddress: String = null // 统计日志根目录
 
   var isLocal: Boolean = false

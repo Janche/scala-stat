@@ -1,6 +1,8 @@
 package com.libii.stat.controller
 
 import java.text.SimpleDateFormat
+import java.time.{Instant, LocalDateTime, ZoneId}
+import java.time.format.DateTimeFormatter
 import java.util.{Date, Properties}
 
 import com.libii.stat.bean.{AdLog, IndeH5Log}
@@ -10,6 +12,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object GameController {
 
+
   def main(args: Array[String]): Unit = {
 
     val sdf: SimpleDateFormat = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
@@ -18,8 +21,7 @@ object GameController {
     val date = "/year=2021/month=9/day=13"
     // 初始化环境变量
     System.setProperty("HADOOP_USER_NAME", "root")
-    val sparkConf = new SparkConf().setAppName("scala-stat").setMaster("local[*]")
-    val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).enableHiveSupport().getOrCreate()
+    val sparkSession: SparkSession = Constant.sparkSession
     val ssc: SparkContext = sparkSession.sparkContext
     ssc.hadoopConfiguration.set("fs.defaultFS", "hdfs://statisticservice")
     ssc.hadoopConfiguration.set("dfs.nameservices", "statisticservice")
@@ -30,17 +32,17 @@ object GameController {
 
     import sparkSession.implicits._ //隐式转换
     val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre" + date)
-    val format = new SimpleDateFormat("yyyymmdd")
+
     val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]
-      .map(data => {
-        val dateStr: String = format.format(new Date(data.timestamp))
+    .map(data => {
+        // val format = new SimpleDateFormat("yyyymmdd") // 多次创建效率低，放在外面有线程安全问题
+        // val dateStr: String = format.format(new Date(data.timestamp))
+        val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
         IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
           data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
       })
 
-    h5LogDs.foreach(println(_))
-    h5LogDs.persist()
-    import sparkSession.implicits._ //隐式转换
+    h5LogDs.persist() //隐式转换
     doNuCount(sparkSession, h5LogDs)
 
     sparkSession.close()

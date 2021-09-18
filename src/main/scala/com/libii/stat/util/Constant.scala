@@ -1,12 +1,19 @@
 package com.libii.stat.util
 
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.{Properties, TimeZone}
 
+import org.apache.spark.SparkConf
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.sql.SparkSession
 
 object Constant {
+  val dtFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
+  val sparkSession: SparkSession = SparkSession.builder()
+    .config(new SparkConf().setAppName("scala-stat").setMaster("local[*]"))
+    .enableHiveSupport().getOrCreate()
+  val sparkContext: JavaSparkContext = sparkSession.sparkContext
   var CHINA_TIME_ZONE: TimeZone = TimeZone.getTimeZone("GMT+8:00")
   val dateFormatTedious = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
   val dateFormatBrief = new SimpleDateFormat("yyyy/MM/dd")
@@ -98,8 +105,6 @@ object Constant {
   val INDE_H5_AD: String = "inde_h5_ad"
   val BOX_H5_AD: String = "box_h5_ad"
   val INDE_H5_DAT: String = "inde_h5_dat"
-  val sparkContext: JavaSparkContext = null
-  val sparkSession: SparkSession = null
   var logRootAddress: String = null // 统计日志根目录
 
   var isLocal: Boolean = false

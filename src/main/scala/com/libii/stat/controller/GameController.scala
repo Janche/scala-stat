@@ -15,7 +15,7 @@ object GameController {
   def main(args: Array[String]): Unit = {
 
     val startTime = System.currentTimeMillis()
-    val dateStr2: String = "20210802"
+    val dateStr2: String = "20210801"
     var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
     val dateTime: Date = sdf.parse(dateStr2)
     sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")

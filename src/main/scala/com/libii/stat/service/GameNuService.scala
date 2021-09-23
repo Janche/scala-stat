@@ -22,17 +22,15 @@ object GameNuService {
     // udid+appId+date，表示同一用户同一天同一款游戏多个日志，只保留一个
     val distinctLogDS: Dataset[IndeH5Log] = installDs.dropDuplicates("udid", "appId", "date")
 
-    val year = dateStr.substring(0, 4)
-    val month = Integer.parseInt(dateStr.substring(4, 6))
-    val day = Integer.parseInt(dateStr.substring(6))
-//    sparkSession.sql("alter table dwd.inde_h5_dnu drop partition (year="+year+", month="+month+", day="+day+")")
     // 保存到hive表
     val hiveResult = distinctLogDS
       .withColumn("year", distinctLogDS("date").substr(0,4))
       .withColumn("month", distinctLogDS("date").substr(5,2))
       .withColumn("day", distinctLogDS("date").substr(7, 2))
-    hiveResult.toDF("", ).show()
-//    hiveResult.coalesce(1).write.mode(SaveMode.Overwrite).insertInto("dwd.inde_h5_dnu")
+      .drop("date")
+//      .toDF("udid","channel","appId","timestamp","deviceType","actionType","version","country",
+//      "sessionFlag","groupId","userType","level","customDotEvent","sceneId","year","month","day")
+    hiveResult.coalesce(1).write.mode(SaveMode.Overwrite).insertInto("dwd.inde_h5_dnu")
 
 
     // 聚合

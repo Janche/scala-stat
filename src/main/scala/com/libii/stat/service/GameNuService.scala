@@ -1,11 +1,11 @@
 package com.libii.stat.service
 
-import java.util.Properties
-
 import com.libii.stat.bean.IndeH5Log
 import com.libii.stat.util.{Constant, JdbcUtil}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
+
+import java.util.Properties
 
 object GameNuService {
 
@@ -28,20 +28,19 @@ object GameNuService {
       .withColumn("month", distinctLogDS("date").substr(5,2))
       .withColumn("day", distinctLogDS("date").substr(7, 2))
       .drop("date")
-//      .toDF("udid","channel","appId","timestamp","deviceType","actionType","version","country",
-//      "sessionFlag","groupId","userType","level","customDotEvent","sceneId","year","month","day")
-    hiveResult.coalesce(1).write.mode(SaveMode.Overwrite).insertInto("dwd.inde_h5_dnu")
-
+    hiveResult.coalesce(1).write.mode(SaveMode.Overwrite)
+//      .partitionBy("year", "month", "day")
+      .insertInto("dwd.inde_h5_dnu")
 
     // 聚合
     val result: DataFrame = handleDataByApi(sparkSession, distinctLogDS)
     //    val result2: DataFrame = handleDataBySql(sparkSession, installDs)
     //删除mysql 已存在的数据
-//    JdbcUtil.executeUpdate("delete from " + JdbcUtil.INDE_H5_DNU + " where date = " + dateStr)
+    JdbcUtil.executeUpdate("delete from " + JdbcUtil.INDE_H5_DNU + " where date = " + dateStr)
 //    // 保存新数据到数据库
-//    result.write
-//      .mode(SaveMode.Append)
-//      .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DNU, props)
+    result.write
+      .mode(SaveMode.Append)
+      .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DNU, props)
 
   }
 

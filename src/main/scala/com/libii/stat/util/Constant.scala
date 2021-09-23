@@ -16,6 +16,7 @@ object Constant {
     .config(new SparkConf().setAppName("scala-stat").setMaster("local[*]"))
     .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
     .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
+    .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
     .enableHiveSupport().getOrCreate()
   val sparkContext: JavaSparkContext = sparkSession.sparkContext
   var CHINA_TIME_ZONE: TimeZone = TimeZone.getTimeZone("GMT+8:00")

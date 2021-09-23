@@ -27,6 +27,7 @@ object GameAuService {
       .withColumn("year", distinctLog("date").substr(0,4))
       .withColumn("month", distinctLog("date").substr(5,2))
       .withColumn("day", distinctLog("date").substr(7, 2))
+      .drop("date")
     hiveResult.coalesce(1).write.mode(SaveMode.Overwrite).insertInto("dwd.inde_h5_dau")
 
     // 先删除mysql已存在的数据

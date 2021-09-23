@@ -297,7 +297,7 @@
     
     <property>
       <name>hive.load.data.owner</name>
-      <value>hive</value>
+      <value>spark</value>
     </property>
     
     <property>

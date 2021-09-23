@@ -15,14 +15,7 @@ object GameController {
   def main(args: Array[String]): Unit = {
 
     val startTime = System.currentTimeMillis()
-    val dateStr2: String = "20210801"
-    var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
-    val dateTime: Date = sdf.parse(dateStr2)
-    sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
-    val dateStr = sdf.format(dateTime)
-    println(dateStr)
-//    dateStr = "/year=2021/month=8/day=2/"
-//    dateStr = "/year=2021/month=9/day=13"
+
     // 初始化环境变量
     System.setProperty("HADOOP_USER_NAME", "root")
     val sparkSession: SparkSession = Constant.sparkSession
@@ -30,39 +23,49 @@ object GameController {
     ssc.hadoopConfiguration.set("fs.defaultFS", "hdfs://statisticservice")
     ssc.hadoopConfiguration.set("dfs.nameservices", "statisticservice")
     // 开启动态分区
-    HiveUtil.openDynamicPartition(sparkSession)
+    //    HiveUtil.openDynamicPartition(sparkSession)
     // 开启压缩
-    HiveUtil.openCompression(sparkSession)
+    //    HiveUtil.openCompression(sparkSession)
+    // 分析 20210801 -- 20210831
+    for (i <- 0 to 4){
 
-    import sparkSession.implicits._ //隐式转换
-    val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre/" + dateStr)
+      val dateStr2: String = 20210801 + i + ""
+      var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
+      val dateTime: Date = sdf.parse(dateStr2)
+      sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
+      val dateStr = sdf.format(dateTime)
+      println(dateStr)
 
-    val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]  // 此处需要隐式转换
-    .mapPartitions(partition => {
-      partition.map(data => {
-        // val format = new SimpleDateFormat("yyyymmdd") // 多次创建效率低，放在外面有线程安全问题
-        // val dateStr: String = format.format(new Date(data.timestamp))
-        val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
-        IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
-          data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
+      import sparkSession.implicits._ //隐式转换
+      val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre/" + dateStr)
+
+      val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]  // 此处需要隐式转换
+      .mapPartitions(partition => {
+        partition.map(data => {
+          // val format = new SimpleDateFormat("yyyymmdd") // 多次创建效率低，放在外面有线程安全问题
+          // val dateStr: String = format.format(new Date(data.timestamp))
+          val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
+          IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
+            data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
+        })
       })
-    })
-   //    使用map的方式
-    //      {
-    //        val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
-    //        IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
-    //          data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
-    //      }
+     //    使用map的方式
+      //      {
+      //        val dateStr = Constant.dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
+      //        IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
+      //          data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
+      //      }
 
-    h5LogDs.persist()
-    // 获取Jdbc参数
-    val props = JdbcUtil.getJdbcProps()
-    // 日新增
-    GameNuService.doNuCount(sparkSession, props, h5LogDs, dateStr2)
-    // 日活跃
-//    GameAuService.doAuCount(sparkSession, props, h5LogDs, dateStr2)
+//      h5LogDs.persist()
+      // 获取Jdbc参数
+      val props = JdbcUtil.getJdbcProps()
+      // 日新增
+      GameNuService.doNuCount(sparkSession, props, h5LogDs, dateStr2)
+      // 日活跃
+      GameAuService.doAuCount(sparkSession, props, h5LogDs, dateStr2)
 
-    h5LogDs.unpersist()
+//      h5LogDs.unpersist()
+    }
     sparkSession.close()
     val endTime = System.currentTimeMillis()
     println("总共耗时：" + (endTime - startTime)/1000)

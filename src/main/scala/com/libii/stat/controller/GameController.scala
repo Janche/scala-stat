@@ -14,11 +14,15 @@ object GameController {
 
   def main(args: Array[String]): Unit = {
 
-    val sdf: SimpleDateFormat = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
-    val dateStr: String = sdf.format(new Date())
+    val startTime = System.currentTimeMillis()
+    val dateStr2: String = "20210802"
+    var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
+    val dateTime: Date = sdf.parse(dateStr2)
+    sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
+    val dateStr = sdf.format(dateTime)
     println(dateStr)
-//    val date = "/year=2021/month=8/day=1/data_2021_08_01.log"
-    val date = "/year=2021/month=9/day=13"
+//    dateStr = "/year=2021/month=8/day=2/"
+//    dateStr = "/year=2021/month=9/day=13"
     // 初始化环境变量
     System.setProperty("HADOOP_USER_NAME", "root")
     val sparkSession: SparkSession = Constant.sparkSession
@@ -31,7 +35,7 @@ object GameController {
     HiveUtil.openCompression(sparkSession)
 
     import sparkSession.implicits._ //隐式转换
-    val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre" + date)
+    val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre/" + dateStr)
 
     val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]  // 此处需要隐式转换
     .mapPartitions(partition => {
@@ -54,12 +58,14 @@ object GameController {
     // 获取Jdbc参数
     val props = JdbcUtil.getJdbcProps()
     // 日新增
-    GameNuService.doNuCount(sparkSession, props, h5LogDs)
+    GameNuService.doNuCount(sparkSession, props, h5LogDs, dateStr2)
     // 日活跃
-//    GameAuService.doAuCount(sparkSession, props, h5LogDs)
+//    GameAuService.doAuCount(sparkSession, props, h5LogDs, dateStr2)
 
     h5LogDs.unpersist()
     sparkSession.close()
+    val endTime = System.currentTimeMillis()
+    println("总共耗时：" + (endTime - startTime)/1000)
   }
 
 }

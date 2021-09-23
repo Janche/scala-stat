@@ -27,22 +27,21 @@ object ProduceData {
 
     // 每天的条数
     val maxCount:Int = 1000
-    var buffer = ArrayBuffer[AdLog]()
     val random = new Random()
-
-    val days:Int = 10
+    val days:Int = 31
     val formatter = DateTimeFormatter.ofPattern("'year='yyyy/'month='M/'day='d")
     val formatter2 = DateTimeFormatter.ofPattern("yyyy_MM_dd")
     for(n <- 0 to days){
+      val ts: Long = (1627747200 + n * 86400) * 1000L
       // 获取生成时间的日期目录
       val datePath = formatter.format(LocalDateTime.ofInstant(
-        Instant.ofEpochMilli((1627747200 + n * 86400) * 1000L), ZoneId.systemDefault))
+        Instant.ofEpochMilli(ts), ZoneId.systemDefault))
 //      val datePathStr = formatter2.format(LocalDateTime.ofInstant(Instant.ofEpochMilli((1627747200 + n * 86400) * 1000L), ZoneId.systemDefault()))
+      var buffer = ArrayBuffer[AdLog]()
       for (i <- 0 until maxCount){
         val udid = UUID.randomUUID().toString.substring(0, 4)
         //        val ts: Long = timestamps(random.nextInt(timestamps.length)) * 1000L
         // 获取日志的时间戳
-        val ts: Long = (1627747200 + n * 86400) * 1000L
         val dateStr = formatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneId.systemDefault))
         buffer += AdLog(udid, appIds(random.nextInt(appIds.length)),
           channels(random.nextInt(channels.length)),
@@ -59,7 +58,6 @@ object ProduceData {
           "v1", "v2", "v3", "v4", "v5", "v6",
           versions(random.nextInt(versions.length)))
       }
-
       val sparkSession = Constant.sparkSession
       val ssc = sparkSession.sparkContext
       val logStream: RDD[AdLog] = ssc.parallelize(buffer)

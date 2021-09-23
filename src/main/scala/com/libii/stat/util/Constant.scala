@@ -4,14 +4,16 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.{Properties, TimeZone}
 
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, sql}
 import org.apache.spark.api.java.JavaSparkContext
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SparkSession, hive}
 
 object Constant {
   val dtFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
   val sparkSession: SparkSession = SparkSession.builder()
     .config(new SparkConf().setAppName("scala-stat").setMaster("local[*]"))
+    .config("spark.sql.sources.partitionOverwriteMode","dynamic")
+    .config("sql.hive.exec.dynamic.partition.mode","nonstrict")
     .enableHiveSupport().getOrCreate()
   val sparkContext: JavaSparkContext = sparkSession.sparkContext
   var CHINA_TIME_ZONE: TimeZone = TimeZone.getTimeZone("GMT+8:00")

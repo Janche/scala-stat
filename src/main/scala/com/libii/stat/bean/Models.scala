@@ -26,20 +26,20 @@ case class BaseGameLog(
 
 case class IndeH5Log(
                       udid: String, // 设备唯一标识
-                      channel: String, // 游戏渠道
                       appId: String, // 应用Bundle ID
-                      date: Int,
-                      timestamp: Long, // 时间戳（服务器获取）
                       deviceType: String, // 设备类型
-                      actionType: String,
-                      version: String, //app版本
-                      country: String, //国家
-                      sessionFlag: Integer, // session标号，从0开始，无效的为-1。
-                      groupId: Long, //分组id
+                      channel: String, // 游戏渠道
                       userType: String = "", //用户类型
+                      sceneId: String, //场景值ID
+                      version: String, //app版本
+                      actionType: String,
+                      sessionFlag: Integer, // session标号，从0开始，无效的为-1。
                       level: String, //关卡级别
                       customDotEvent: String, //自定义打点事件
-                      sceneId: String //场景值ID
+                      groupId: Long, //分组id
+                      timestamp: Long, // 时间戳（服务器获取）
+                      country: String, //国家
+                      date: Int
                     )
 case class AdLog (
                   udid: String,

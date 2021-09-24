@@ -19,7 +19,7 @@ object GameController {
     System.setProperty("HADOOP_USER_NAME", "root")
     val sparkSession: SparkSession = SparkSession.builder()
       .config(new SparkConf().setAppName("scala-stat")
-        //      .setMaster("local[*]")
+              .setMaster("local[*]")
       )
       //    .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
       //    .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
@@ -35,17 +35,19 @@ object GameController {
     //    HiveUtil.openCompression(sparkSession)
 
     // 分析 20210801 -- 20210831
+    args(0) = "0"
     for (i <- 0 to args(0).toInt){
-      val dateStr2: String = 20210801 + i + ""
+      var dateStr2: String = 20210801 + i + ""
+      dateStr2 = "20210807"
       var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
       val dateTime: Date = sdf.parse(dateStr2)
       sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
       val dateStr = sdf.format(dateTime)
       println(dateStr)
 
-      import sparkSession.implicits._ //隐式转换
       val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre/" + dateStr)
 
+      import sparkSession.implicits._ //隐式转换
       val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog]  // 此处需要隐式转换
       .mapPartitions(partition => {
         partition.map(data => {
@@ -68,10 +70,13 @@ object GameController {
       // 获取Jdbc参数
       val props = JdbcUtil.getJdbcProps()
       // 日新增
-      GameNuService.doNuCount(sparkSession, props, h5LogDs, dateStr2)
+//      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
       // 日活跃
-      GameAuService.doAuCount(sparkSession, props, h5LogDs, dateStr2)
-
+//      GameAuService.doDauCount(sparkSession, props, h5LogDs, dateStr2)
+      // 周活跃
+//      GameAuService.doWauCount(sparkSession, props, dateStr2)
+      // 月活跃
+      GameAuService.doMauCount(sparkSession, props, dateStr2)
       h5LogDs.unpersist()
     }
     sparkSession.close()

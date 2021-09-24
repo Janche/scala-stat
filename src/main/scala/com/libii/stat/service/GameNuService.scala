@@ -9,7 +9,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
 
 object GameNuService {
 
-  def doNuCount(sparkSession: SparkSession, props: Properties, h5LogDs: Dataset[IndeH5Log], dateStr: String) = {
+  def doDnuCount(sparkSession: SparkSession, props: Properties, h5LogDs: Dataset[IndeH5Log], dateStr: String) = {
     val installDs: Dataset[IndeH5Log] = h5LogDs.filter(log => log.actionType.equals(Constant.INSTALL))
     /*
      val distinctLogDF: DataFrame = installDs.dropDuplicates("udid", "appId", "date")

@@ -20,6 +20,10 @@ object JdbcUtil {
 
   val INDE_H5_DNU = "inde_h5_dnu_scala"
 
+  val INDE_H5_WAU = "inde_h5_wau_scala"
+
+  val INDE_H5_MAU = "inde_h5_mau_scala"
+
   def getJdbcProps(): Properties = {
     val props = new Properties()
     props.setProperty("user", DATABASE_USER)

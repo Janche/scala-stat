@@ -97,25 +97,26 @@ object Constant extends Serializable {
   val INDE_H5_AD: String = "inde_h5_ad"
   val BOX_H5_AD: String = "box_h5_ad"
   val INDE_H5_DAT: String = "inde_h5_dat"
-  var logRootAddress: String = null // 统计日志根目录
+  var logRootAddress: String = _ // 统计日志根目录
 
   var isLocal: Boolean = false
-  var databaseAddress: String = null
-  var databaseUsername: String = null
-  var databasePassword: String = null
-  var connectionProperties: Properties = null
-  var hisDateTediousStr: String = null // 待运行数据日期，格式"'year='yyyy/'month='M/'day='d"
+  var databaseAddress: String = _
+  var databaseUsername: String = _
+  var databasePassword: String = _
+  var connectionProperties: Properties = _
+  var hisDateTediousStr: String = _ // 待运行数据日期，格式"'year='yyyy/'month='M/'day='d"
 
-  var hisDateBriefStr: String = null // 待运行数据日期，格式"yyyy/MM/dd"
+  var hisDateBriefStr: String = _ // 待运行数据日期，格式"yyyy/MM/dd"
 
   var hisDateInt: Int = 0 // 待运行数据日期
 
-  var hisDateWeekStartStr: String = null // 待运行数据日期星期一的日期，格式"yyyy/MM/dd"
+  var hisDateWeekStartStr: String = _ // 待运行数据日期星期一的日期，格式"yyyy/MM/dd"
+  var hisDateWeekStartLong: Long = 0L
+  var hisDateWeekEndStr: String = _
+  var hisDateWeekEndLong: Long = 0L
 
-  var hisDateWeekStartInt: Int = 0
-  var hisDateWeekEndStr: String = null
-  var hisDateMonthStr: String = null // 待运行数据日期所在月份，格式"yyyy/MM"
-
-  var hisDateMonthInt: Int = 0 // 待运行数据日期星期天的日期，格式"yyyy/MM/dd"
-
+  var hisDateMonthStartStr: String = _ // 待运行数据日期所在月份，格式"yyyy/MM"
+  var hisDateMonthStartLong: Long = 0L // 待运行数据日期星期天的日期，格式"yyyy/MM/dd"
+  var hisDateMonthEndStr: String = _
+  var hisDateMonthEndLong: Long = 0L
 }

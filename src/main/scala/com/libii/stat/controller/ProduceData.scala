@@ -3,10 +3,13 @@ package com.libii.stat.controller
 import com.libii.stat.bean.AdLog
 import com.libii.stat.util.Constant
 import org.apache.spark.rdd.RDD
-
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util.UUID
+
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
@@ -28,6 +31,7 @@ object ProduceData {
     // 每天的条数
     val maxCount:Int = 1000
     val random = new Random()
+    // 天数
     val days:Int = 31
     val formatter = DateTimeFormatter.ofPattern("'year='yyyy/'month='M/'day='d")
     val formatter2 = DateTimeFormatter.ofPattern("yyyy_MM_dd")
@@ -58,7 +62,14 @@ object ProduceData {
           "v1", "v2", "v3", "v4", "v5", "v6",
           versions(random.nextInt(versions.length)))
       }
-      val sparkSession = Constant.sparkSession
+
+      val sparkSession: SparkSession = SparkSession.builder()
+        .config(new SparkConf().setAppName("scala-stat").setMaster("local[*]")
+        )
+        //    .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
+        //    .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
+        .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
+        .enableHiveSupport().getOrCreate()
       val ssc = sparkSession.sparkContext
       val logStream: RDD[AdLog] = ssc.parallelize(buffer)
       import sparkSession.implicits._

@@ -1,16 +1,16 @@
 package com.libii.stat.service
 
+import java.util.Properties
+
 import com.libii.stat.bean.IndeH5Log
 import com.libii.stat.util.{Constant, JdbcUtil}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
 
-import java.util.Properties
-
 object GameNuService {
 
   def doNuCount(sparkSession: SparkSession, props: Properties, h5LogDs: Dataset[IndeH5Log], dateStr: String) = {
-    val installDs: Dataset[IndeH5Log] = h5LogDs.filter(log => log.actionType == Constant.INSTALL)
+    val installDs: Dataset[IndeH5Log] = h5LogDs.filter(log => log.actionType.equals(Constant.INSTALL))
     /*
      val distinctLogDF: DataFrame = installDs.dropDuplicates("udid", "appId", "date")
      // 重命名列名
@@ -40,6 +40,7 @@ object GameNuService {
 //    // 保存新数据到数据库
     result.write
       .mode(SaveMode.Append)
+      .option("driver", "com.mysql.jdbc.Driver")
       .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DNU, props)
 
   }

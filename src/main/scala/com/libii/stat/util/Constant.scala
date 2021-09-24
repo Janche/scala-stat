@@ -4,21 +4,8 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.{Properties, TimeZone}
 
-import org.apache
-import org.apache.spark
-import org.apache.spark.{SparkConf, sql}
-import org.apache.spark.api.java.JavaSparkContext
-import org.apache.spark.sql.{SparkSession, hive}
-
-object Constant {
-  val dtFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
-  val sparkSession: SparkSession = SparkSession.builder()
-    .config(new SparkConf().setAppName("scala-stat").setMaster("local[*]"))
-    .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
-    .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
-    .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
-    .enableHiveSupport().getOrCreate()
-  val sparkContext: JavaSparkContext = sparkSession.sparkContext
+object Constant extends Serializable {
+  val dtFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
   var CHINA_TIME_ZONE: TimeZone = TimeZone.getTimeZone("GMT+8:00")
   val dateFormatTedious = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
   val dateFormatBrief = new SimpleDateFormat("yyyy/MM/dd")

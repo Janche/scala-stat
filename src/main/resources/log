@@ -13,6 +13,7 @@ CREATE TABLE `dwd.inde_h5_dnu`(
    `udid` string,
    `channel` string,
    `appid` string,
+   `date` Int,
    `timestamp` bigint,
    `deviceType` string,
    `actionType` string,

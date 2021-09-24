@@ -36,7 +36,6 @@ object GameAuService {
       .withColumn("year", distinctLog("date").substr(0,4))
       .withColumn("month", distinctLog("date").substr(5,2))
       .withColumn("day", distinctLog("date").substr(7, 2))
-      .drop("date")
     hiveResult.coalesce(1).write.mode(SaveMode.Overwrite).insertInto("dwd.inde_h5_dau")
 
     // 先删除mysql已存在的数据
@@ -58,10 +57,17 @@ object GameAuService {
    */
   def doWauCount(sparkSession: SparkSession, props: Properties, dateStr: String): Unit = {
 
-    val mondayStr = Utils.initWeekDate(dateStr)
+    val mondayStr: String = Utils.initWeekDate(dateStr)
+    import sparkSession.implicits._
     val weekLogDF: Dataset[Row] = sparkSession.sql(s"select * from dwd.inde_h5_dau where timestamp >= ${Constant.hisDateWeekStartLong}" +
       s" and timestamp <= ${Constant.hisDateWeekEndLong}")
-      .dropDuplicates("udid", "appId", "year", "month", "day")
+//      .as[IndeH5Log]
+//      .map(data => {
+//        data.date += 0
+//        data.date
+//        data
+//      })
+      .dropDuplicates("udid", "appId", "date")
 
     weekLogDF.createOrReplaceTempView("activeWau")
 

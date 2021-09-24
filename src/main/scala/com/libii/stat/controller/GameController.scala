@@ -35,10 +35,10 @@ object GameController {
     //    HiveUtil.openCompression(sparkSession)
 
     // 分析 20210801 -- 20210831
-    args(0) = "0"
+//    args(0) = "0"
     for (i <- 0 to args(0).toInt){
       var dateStr2: String = 20210801 + i + ""
-      dateStr2 = "20210807"
+//      dateStr2 = "20210807"
       var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
       val dateTime: Date = sdf.parse(dateStr2)
       sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
@@ -70,11 +70,11 @@ object GameController {
       // 获取Jdbc参数
       val props = JdbcUtil.getJdbcProps()
       // 日新增
-//      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
+      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
       // 日活跃
-//      GameAuService.doDauCount(sparkSession, props, h5LogDs, dateStr2)
+      GameAuService.doDauCount(sparkSession, props, h5LogDs, dateStr2)
       // 周活跃
-//      GameAuService.doWauCount(sparkSession, props, dateStr2)
+      GameAuService.doWauCount(sparkSession, props, dateStr2)
       // 月活跃
       GameAuService.doMauCount(sparkSession, props, dateStr2)
       h5LogDs.unpersist()

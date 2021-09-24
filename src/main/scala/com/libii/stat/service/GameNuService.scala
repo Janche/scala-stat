@@ -27,7 +27,6 @@ object GameNuService {
       .withColumn("year", distinctLogDS("date").substr(0,4))
       .withColumn("month", distinctLogDS("date").substr(5,2))
       .withColumn("day", distinctLogDS("date").substr(7, 2))
-      .drop("date")
     hiveResult.coalesce(1).write.mode(SaveMode.Overwrite)
 //      .partitionBy("year", "month", "day")
       .insertInto("dwd.inde_h5_dnu")

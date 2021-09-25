@@ -4,10 +4,9 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util.Date
-
 import com.libii.stat.bean.{AdLog, IndeH5Log}
 import com.libii.stat.service.{GameAuService, GameNuService}
-import com.libii.stat.util.JdbcUtil
+import com.libii.stat.util.{HiveUtil, JdbcUtil}
 import org.apache.spark.sql._
 import org.apache.spark.{SparkConf, SparkContext}
 object GameController {
@@ -21,8 +20,8 @@ object GameController {
       .config(new SparkConf().setAppName("scala-stat")
               .setMaster("local[*]")
       )
-      //    .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
-      //    .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
+//      .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
+//      .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
       .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
       .enableHiveSupport().getOrCreate()
 
@@ -30,12 +29,12 @@ object GameController {
     ssc.hadoopConfiguration.set("fs.defaultFS", "hdfs://statisticservice")
     ssc.hadoopConfiguration.set("dfs.nameservices", "statisticservice")
     // 开启动态分区
-    //    HiveUtil.openDynamicPartition(sparkSession)
+//        HiveUtil.openDynamicPartition(sparkSession)
     // 开启压缩
-    //    HiveUtil.openCompression(sparkSession)
+//        HiveUtil.openCompression(sparkSession)
 
     // 分析 20210801 -- 20210831
-//    args(0) = "0"
+//    args(0) = "1"
     for (i <- 0 to args(0).toInt){
       var dateStr2: String = 20210801 + i + ""
 //      dateStr2 = "20210807"

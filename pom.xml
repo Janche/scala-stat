@@ -16,7 +16,7 @@
     </properties>
 
     <dependencies>
-        <!-- Spark的依赖引入 -->
+        <!-- Spark的依赖引入  部署请打开 provided注释 -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>

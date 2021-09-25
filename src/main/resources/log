@@ -9,7 +9,7 @@
 +----------------------------------------------+--------------------------+-------------------------------+----------------------------+-----------------------------+----------------------------+----------------------------+-------------------------------+----------------------------------+------------------------------+--------------------------------+--------------------------+-----------------------------------+----------------------------+--------------------------------+---------------------------------+--------------------------------+------------------------------+-----------------------------+---------------------------------+---------------------------------+-----------------------+-----------------------+-----------------------+-----------------------+-----------------------+-----------------------+-----------------------+-----------------------+------------------------------+-----------------------+----------------------------+-------------------------+-------------------------+--------------------------+------------------------+
 
 # hvie 建表语句
-CREATE TABLE `dwd.inde_h5_dnu`(
+CREATE TABLE `dwd.inde_h5_dau`(
    `udid` string,
    `channel` string,
    `appid` string,
@@ -31,64 +31,80 @@ CREATE TABLE `dwd.inde_h5_dnu`(
    `day` int)
  STORED AS PARQUET
  LOCATION
-   'hdfs://statisticservice/dwd/inde_h5_dnu'
+   'hdfs://statisticservice/warehouse/tablespace/managed/hive/dwd.db/inde_h5_dau'
  TBLPROPERTIES('parquet.compression'='SNAPPY');
 
 
-CREATE EXTERNAL TABLE `inde_h5_event_pre`(         |
-|   `udid` string,                                   |
-|   `appid` string,                                  |
-|   `devicetype` string,                             |
-|   `channel` string,                                |
-|   `usertype` string,                               |
-|   `sceneid` string,                                |
-|   `version` string,                                |
-|   `actiontype` string,                             |
-|   `localtimezone` string,                          |
-|   `localtime` string,                              |
-|   `sessionflag` int,                               |
-|   `level` string,                                  |
-|   `customdotevent` string,                         |
-|   `groupid` bigint,                                |
-|   `confversion` string,                            |
-|   `actionsource` string,                           |
-|   `devicemodel` string,                            |
-|   `osversion` string,                              |
-|   `currency` string,                               |
-|   `purchasecost` double,                           |
-|   `purchaseitem` string,                           |
-|   `v1` string,                                     |
-|   `v2` string,                                     |
-|   `v3` string,                                     |
-|   `v4` string,                                     |
-|   `v5` string,                                     |
-|   `v6` string,                                     |
-|   `v7` string,                                     |
-|   `v8` string,                                     |
-|   `timestamp` bigint,                              |
-|   `ip` string,                                     |
-|   `country` string,                                |
-|   `city` string)                                   |
-| PARTITIONED BY (                                   |
-|   `year` int,                                      |
-|   `month` int,                                     |
-|   `day` int)                                       |
-| ROW FORMAT SERDE                                   |
-|   'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'  |
-| STORED AS INPUTFORMAT                              |
-|   'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'  |
-| OUTPUTFORMAT                                       |
-|   'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat' |
-| LOCATION                                           |
-|   'hdfs://statisticservice/input/log_entry/inde_h5_event_pre' |
-| TBLPROPERTIES (                                    |
-|   'presto_query_id'='20210714_020909_00011_fzkzv',  |
-|   'presto_version'='0.256-1b6276d',                |
-|   'spark.sql.create.version'='2.2 or prior',       |
-|   'spark.sql.sources.schema.numPartCols'='3',      |
-|   'spark.sql.sources.schema.numParts'='1',         |
-|   'spark.sql.sources.schema.part.0'='{"type":"struct","fields":[{"name":"udid","type":"string","nullable":true,"metadata":{}},{"name":"appId","type":"string","nullable":true,"metadata":{}},{"name":"deviceType","type":"string","nullable":true,"metadata":{}},{"name":"channel","type":"string","nullable":true,"metadata":{}},{"name":"userType","type":"string","nullable":true,"metadata":{}},{"name":"sceneId","type":"string","nullable":true,"metadata":{}},{"name":"version","type":"string","nullable":true,"metadata":{}},{"name":"actionType","type":"string","nullable":true,"metadata":{}},{"name":"localTimeZone","type":"string","nullable":true,"metadata":{}},{"name":"localTime","type":"string","nullable":true,"metadata":{}},{"name":"sessionFlag","type":"integer","nullable":true,"metadata":{}},{"name":"level","type":"string","nullable":true,"metadata":{}},{"name":"customDotEvent","type":"string","nullable":true,"metadata":{}},{"name":"groupId","type":"long","nullable":true,"metadata":{}},{"name":"confVersion","type":"string","nullable":true,"metadata":{}},{"name":"actionsource","type":"string","nullable":true,"metadata":{}},{"name":"deviceModel","type":"string","nullable":true,"metadata":{}},{"name":"osVersion","type":"string","nullable":true,"metadata":{}},{"name":"currency","type":"string","nullable":true,"metadata":{}},{"name":"purchasecost","type":"double","nullable":true,"metadata":{}},{"name":"purchaseitem","type":"string","nullable":true,"metadata":{}},{"name":"v1","type":"string","nullable":true,"metadata":{}},{"name":"v2","type":"string","nullable":true,"metadata":{}},{"name":"v3","type":"string","nullable":true,"metadata":{}},{"name":"v4","type":"string","nullable":true,"metadata":{}},{"name":"v5","type":"string","nullable":true,"metadata":{}},{"name":"v6","type":"string","nullable":true,"metadata":{}},{"name":"v7","type":"string","nullable":true,"metadata":{}},{"name":"v8","type":"string","nullable":true,"metadata":{}},{"name":"timestamp","type":"long","nullable":true,"metadata":{}},{"name":"ip","type":"string","nullable":true,"metadata":{}},{"name":"country","type":"string","nullable":true,"metadata":{}},{"name":"city","type":"string","nullable":true,"metadata":{}},{"name":"year","type":"integer","nullable":true,"metadata":{}},{"name":"month","type":"integer","nullable":true,"metadata":{}},{"name":"day","type":"integer","nullable":true,"metadata":{}}]}',  |
-|   'spark.sql.sources.schema.partCol.0'='year',     |
-|   'spark.sql.sources.schema.partCol.1'='month',    |
-|   'spark.sql.sources.schema.partCol.2'='day',      |
-|   'transient_lastDdlTime'='1630052349')
+ # dnu
+ drop table `dwd.inde_h5_dnu`;create table if not exists `dwd.inde_h5_dnu`(
+    `udid` string,
+    `channel` string,
+    `appid` string,
+    `date` Int,
+    `timestamp` bigint,
+    `deviceType` string,
+    `actionType` string,
+    `version` string,
+    `country` string,
+    `sessionFlag` int,
+    `groupId` bigint,
+    `userType` string,
+    `level` string,
+    `customDotEvent` string,
+    `sceneId` string)
+  PARTITIONED BY (
+    `year` int,
+    `month` int,
+    `day` int)
+  STORED AS PARQUET
+  LOCATION
+    'hdfs://statisticservice/warehouse/tablespace/managed/hive/dwd.db/inde_h5_dnu'
+  TBLPROPERTIES(
+     'auto.purge'='true',
+     'immutable'='false',
+     'transactional'='false');
+
+# dau
+drop table `dwd.inde_h5_dau`;create table if not exists `dwd.inde_h5_dau`(
+   `udid` string,
+   `channel` string,
+   `appid` string,
+   `date` Int,
+   `timestamp` bigint,
+   `deviceType` string,
+   `actionType` string,
+   `version` string,
+   `country` string,
+   `sessionFlag` int,
+   `groupId` bigint,
+   `userType` string,
+   `level` string,
+   `customDotEvent` string,
+   `sceneId` string)
+ PARTITIONED BY (
+   `year` int,
+   `month` int,
+   `day` int)
+ STORED AS PARQUET
+ LOCATION
+   'hdfs://statisticservice/warehouse/tablespace/managed/hive/dwd.db/inde_h5_dau'
+ TBLPROPERTIES(
+    'auto.purge'='true',
+    'immutable'='false',
+    'transactional'='false');
+  /**
+      'auto.purge'='true' 删除或者覆盖的数据会不经过回收站，直接被删除
+      'immutable'='false' 属性为true时，若表中无数据时可以insert数据，但是当表已经有数据时，insert操作会失败，防止意外更新
+      'transactional'='false' 当此属性为true时，依旧不能overwrite覆盖更新，只能insert-only
+   */
+
+# 上面的方式创建表依旧不能覆盖写入，最好的方式就是采用 overwrite + saveAsTable,自动创建表，然后改成 overwrite + insertInto 就可以覆盖写入分区数据了
+# create_table.sql中的建表方式可以，分区覆盖写入
+
+spark-submit --master yarn --deploy-mode client \
+--driver-memory 1g --num-executors 2 --executor-cores 2 \
+--executor-memory 2g --class com.libii.stat.controller.GameController \
+--queue default /root/spark_jar/scala-stat-1.0-SNAPSHOT-jar-with-dependencies.jar 30
+
+# 出现的异常
+Caused by: MetaException(message:Your client does not appear to support insert-only tables. To skip capability checks, please set metastore.client.capability.check to false.

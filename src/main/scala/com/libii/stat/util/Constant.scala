@@ -6,6 +6,7 @@ import java.util.{Properties, TimeZone}
 
 object Constant extends Serializable {
   val dtFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+  val sdFormat: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
   var CHINA_TIME_ZONE: TimeZone = TimeZone.getTimeZone("GMT+8:00")
   val dateFormatTedious = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
   val dateFormatBrief = new SimpleDateFormat("yyyy/MM/dd")
@@ -110,13 +111,13 @@ object Constant extends Serializable {
 
   var hisDateInt: Int = 0 // 待运行数据日期
 
-  var hisDateWeekStartStr: String = _ // 待运行数据日期星期一的日期，格式"yyyy/MM/dd"
-  var hisDateWeekStartLong: Long = 0L
-  var hisDateWeekEndStr: String = _
+  var hisDateWeekStartStr: String = _ // 待运行数据日期星期一的日期，格式"yyyyMMdd"
+  var hisDateWeekStartLong: Long = 0L // 待运行数据日期星期一的时间戳
+  var hisDateWeekEndStr: String = _   // 待运行数据日期星期天的日期，格式"yyyyMMdd"
   var hisDateWeekEndLong: Long = 0L
 
-  var hisDateMonthStartStr: String = _ // 待运行数据日期所在月份，格式"yyyy/MM"
-  var hisDateMonthStartLong: Long = 0L // 待运行数据日期星期天的日期，格式"yyyy/MM/dd"
-  var hisDateMonthEndStr: String = _
+  var hisDateMonthStartStr: String = _ // 待运行数据日期所在月份第一天，格式"yyyyMMdd"
+  var hisDateMonthStartLong: Long = 0L // 待运行数据日期所在月份第一天的时间戳，格式"yyyy/MM/dd"
+  var hisDateMonthEndStr: String = _   // 待运行数据日期所在月份最后一天，格式"yyyyMMdd"
   var hisDateMonthEndLong: Long = 0L
 }

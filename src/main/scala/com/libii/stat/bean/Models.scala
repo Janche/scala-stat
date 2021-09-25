@@ -27,7 +27,7 @@ case class IndeH5Log(
                       udid: String, // 设备唯一标识
                       channel: String, // 游戏渠道
                       appId: String, // 应用Bundle ID
-                      date: Int,
+                      var date: Int,
                       timestamp: Long, // 时间戳（服务器获取）
                       deviceType: String, // 设备类型
                       actionType: String,

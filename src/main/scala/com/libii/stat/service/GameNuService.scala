@@ -28,7 +28,7 @@ object GameNuService {
       .withColumn("month", distinctLogDS("date").substr(5,2))
       .withColumn("day", distinctLogDS("date").substr(7, 2))
     hiveResult.coalesce(1).write.mode(SaveMode.Overwrite)
-//      .partitionBy("year", "month", "day")
+//      .partitionBy("year", "month", "day") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
       .insertInto("dwd.inde_h5_dnu")
 
     // 聚合

@@ -30,13 +30,11 @@ object GameAuService {
         | group by appId, channel, date, deviceType, country, version, groupId, userType
         |""".stripMargin)
 
+    println("dau:")
+    distinctLog.show(1)
     // 去重后的日活保存到hive表
-    val hiveResult = distinctLog
-      .withColumn("year", distinctLog("date").substr(0,4))
-      .withColumn("month", distinctLog("date").substr(5,2))
-      .withColumn("day", distinctLog("date").substr(7, 2))
-    hiveResult.coalesce(1).write.mode(SaveMode.Overwrite)
-//      .partitionBy("year", "month", "day") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
+    distinctLog.coalesce(1).write.mode(SaveMode.Overwrite)
+//      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
       .insertInto("dwd.inde_h5_dau")
 
     // 先删除mysql已存在的数据

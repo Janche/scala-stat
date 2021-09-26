@@ -33,7 +33,6 @@ case class IndeH5Log(
                       actionType: String,
                       version: String, //app版本
                       country: String, //国家
-                      sessionFlag: Integer, // session标号，从0开始，无效的为-1。
                       groupId: Long, //分组id
                       userType: String = "", //用户类型
                       level: String, //关卡级别
@@ -70,3 +69,27 @@ case class AdLog (
                   v5: String,
                   version: String
 )
+
+case class AdLog2 (
+                   udid: String,
+                   appId: String,
+                   channel: String,
+                   deviceType: String,
+                   groupId: BigInt,
+                   actionType: String,
+                   country: String,
+                   city: String,
+                   timestamp: Long, // 时间戳（服务器获取）
+                   localTime: String,
+                   localTimeZone: String,
+                   userType: String,
+                   sceneId: String, //场景值ID
+                   confVersion: String,
+//                   sessionFlag: Integer,
+                   customDotEvent: String, //自定义打点事件
+                   ip: String,
+                   level: String,
+                   v1: String,
+                   v2: String,
+                   version: String
+                 )

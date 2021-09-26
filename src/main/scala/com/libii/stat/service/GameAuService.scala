@@ -30,8 +30,6 @@ object GameAuService {
         | group by appId, channel, date, deviceType, country, version, groupId, userType
         |""".stripMargin)
 
-    println("dau:")
-    distinctLog.show(1)
     // 去重后的日活保存到hive表
     distinctLog.coalesce(1).write.mode(SaveMode.Overwrite)
 //      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据

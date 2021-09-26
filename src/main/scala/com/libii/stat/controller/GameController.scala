@@ -59,8 +59,8 @@ object GameController {
           if (null == groupId){
             groupId = 0
           }
-          IndeH5Log(data.udid, data.channel, data.appId, dateStr2.toInt, data.timestamp, data.deviceType, data.actionType,
-            data.version, data.country, groupId.toLong, data.userType, data.level, data.customDotEvent, data.sceneId)
+          IndeH5Log(data.udid, data.channel, data.appId, data.timestamp, data.deviceType, data.actionType,
+            data.version, data.country, groupId.toLong, data.userType, data.level, data.customDotEvent, data.sceneId, dateStr2.toInt)
         })
       })
      //    使用map的方式

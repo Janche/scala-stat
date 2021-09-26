@@ -21,8 +21,6 @@ object GameNuService {
     // 同一天数据去重（同一天同一用户可能同时安装多款游戏，同一款游戏也可能安装多次，所以要进行去重
     // udid+appId+date，表示同一用户同一天同一款游戏多个日志，只保留一个
     val distinctLogDS: Dataset[IndeH5Log] = installDs.dropDuplicates("udid", "appId", "date")
-    println("dnu:")
-    distinctLogDS.show(1)
     // 保存到hive表
     distinctLogDS.coalesce(1).write.mode(SaveMode.Overwrite)
 //      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据

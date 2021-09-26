@@ -27,7 +27,6 @@ case class IndeH5Log(
                       udid: String, // 设备唯一标识
                       channel: String, // 游戏渠道
                       appId: String, // 应用Bundle ID
-                      var date: Int,
                       timestamp: Long, // 时间戳（服务器获取）
                       deviceType: String, // 设备类型
                       actionType: String,
@@ -37,7 +36,8 @@ case class IndeH5Log(
                       userType: String = "", //用户类型
                       level: String, //关卡级别
                       customDotEvent: String, //自定义打点事件
-                      sceneId: String //场景值ID
+                      sceneId: String, //场景值ID
+                      var date: Int
                     )
 
 case class AdLog (
@@ -84,7 +84,7 @@ case class AdLog2 (
                    localTimeZone: String,
                    userType: String,
                    sceneId: String, //场景值ID
-                   confVersion: String,
+//                   confVersion: String,
 //                   sessionFlag: Integer,
                    customDotEvent: String, //自定义打点事件
                    ip: String,

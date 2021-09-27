@@ -4,9 +4,12 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util.Date
+
 import com.libii.stat.bean.{AdLog, AdLog2, IndeH5Log}
-import com.libii.stat.service.{GameAuService, GameNuService}
+import com.libii.stat.service.{GameAuService, GameNuService, GameRetainService}
 import com.libii.stat.util.{HiveUtil, JdbcUtil}
+import org.apache
+import org.apache.spark
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions.desc
 import org.apache.spark.{SparkConf, SparkContext}
@@ -24,6 +27,7 @@ object GameController {
 //      .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
 //      .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
       .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
+      .config("apache.spark.debug.maxToStringFields", 1000) // 解决Truncated the string representation of a plan since it was too large
       .enableHiveSupport().getOrCreate()
 
     val ssc: SparkContext = sparkSession.sparkContext
@@ -38,7 +42,7 @@ object GameController {
     args(0) = "0"
     for (i <- 0 to args(0).toInt){
       var dateStr2: String = 20210901 + i + ""
-//      dateStr2 = "20210905"
+      dateStr2 = "20210925"
       var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
       val dateTime: Date = sdf.parse(dateStr2)
       sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
@@ -46,9 +50,9 @@ object GameController {
       println(dateStr)
 
       val df: DataFrame = sparkSession.read.parquet("/input/log_entry/inde_h5_event_pre/" + dateStr)
-
       import sparkSession.implicits._ //隐式转换
-      val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog2]  // 此处需要隐式转换
+
+      val h5LogDs: Dataset[IndeH5Log] = df.as[AdLog2]
       .mapPartitions(partition => {
         partition.map(data => {
           // val format = new SimpleDateFormat("yyyymmdd") // 多次创建效率低，放在外面有线程安全问题
@@ -70,17 +74,20 @@ object GameController {
       //          data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
       //      }
 
+//      JdbcUtil.executeByCondition(sparkSession, dateStr2)
       h5LogDs.persist()
       // 获取Jdbc参数
       val props = JdbcUtil.getJdbcProps()
       // 日新增
-      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
+//      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
       // 日活跃
-      GameAuService.doDauCount(sparkSession, props, h5LogDs, dateStr2)
+      val dauDS: Dataset[IndeH5Log] = GameAuService.doDauCount(sparkSession, props, h5LogDs, dateStr2)
       // 周活跃
-      GameAuService.doWauCount(sparkSession, props, dateStr2)
+//      GameAuService.doWauCount(sparkSession, props, dateStr2)
       // 月活跃
-      GameAuService.doMauCount(sparkSession, props, dateStr2)
+//      GameAuService.doMauCount(sparkSession, props, dateStr2)
+
+      GameRetainService.doRetainCount(sparkSession, dauDS, props, dateStr2)
       h5LogDs.unpersist()
     }
     sparkSession.close()

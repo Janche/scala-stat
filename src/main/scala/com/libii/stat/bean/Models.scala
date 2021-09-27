@@ -93,3 +93,13 @@ case class AdLog2 (
                    v2: String,
                    version: String
                  )
+
+case class RetainH5Log (
+                         udid: String ,
+                         appId: String ,
+                         deviceType: String ,
+                         version: String ,
+                         country: String ,
+                         channel: String,
+                         groupId: Int
+                       )

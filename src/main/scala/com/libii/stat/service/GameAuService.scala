@@ -31,17 +31,18 @@ object GameAuService {
         |""".stripMargin)
 
     // 去重后的日活保存到hive表
-    distinctLog.coalesce(1).write.mode(SaveMode.Overwrite)
-//      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
-      .insertInto("dwd.inde_h5_dau")
+//    distinctLog.coalesce(1).write.mode(SaveMode.Overwrite)
+////      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
+//      .insertInto("dwd.inde_h5_dau")
 
     // 先删除mysql已存在的数据
-    JdbcUtil.executeUpdate("delete from " + JdbcUtil.INDE_H5_DAU + " where date = " + dateStr)
+//    JdbcUtil.executeUpdate("delete from " + JdbcUtil.INDE_H5_DAU + " where date = " + dateStr)
     // 保存到mysql
-    result.write
-      .mode(SaveMode.Append)
-      .option("driver", "com.mysql.jdbc.Driver")
-      .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DAU, props)
+//    result.write
+//      .mode(SaveMode.Append)
+//      .option("driver", "com.mysql.jdbc.Driver")
+//      .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DAU, props)
+    distinctLog
   }
 
   /**

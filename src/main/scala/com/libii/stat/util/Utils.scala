@@ -1,6 +1,6 @@
 package com.libii.stat.util
 
-import java.text.SimpleDateFormat
+import java.text.{ParseException, SimpleDateFormat}
 import java.util.{Calendar, Date}
 
 object Utils {
@@ -52,5 +52,25 @@ object Utils {
     Constant.hisDateWeekEndStr = Constant.sdFormat.format(cal.getTime)
     Constant.hisDateWeekEndLong = cal.getTimeInMillis
     Constant.hisDateWeekStartStr
+  }
+
+  /**
+   * 获取某一天的前n天的日期 要获取前一天的日期，n就为1
+   * 输入格式：('yyyyMMdd') -> 输出格式（"yyyyMMdd"）
+   */
+  def beforeNDays(dayStr: String, n: Int): String = {
+    try {
+      val dateNow: Date = Constant.sdFormat.parse(dayStr)
+      val cl = Calendar.getInstance
+      cl.setTime(dateNow)
+      cl.add(Calendar.DATE, -n) // n天
+
+      val dateFrom = cl.getTime
+      return Constant.sdFormat.format(dateFrom)
+    } catch {
+      case e: ParseException =>
+        println(e.getMessage, e)
+    }
+    ""
   }
 }

@@ -1,23 +1,17 @@
 package com.libii.stat.service
 
-import java.util.Properties
-
 import com.libii.stat.bean.IndeH5Log
 import com.libii.stat.util.{Constant, JdbcUtil}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
 
+import java.util.Properties
+
 object GameNuService {
 
   def doDnuCount(sparkSession: SparkSession, props: Properties, h5LogDs: Dataset[IndeH5Log], dateStr: String) = {
     val installDs: Dataset[IndeH5Log] = h5LogDs.filter(log => log.actionType.equals(Constant.INSTALL))
-    /*
-     val distinctLogDF: DataFrame = installDs.dropDuplicates("udid", "appId", "date")
-     // 重命名列名
-         .withColumnRenamed("appId", "app_id")
-         .withColumnRenamed("deviceType", "device_type")
-         .withColumnRenamed("groupId", "group_id")
-    */
+
     // 同一天数据去重（同一天同一用户可能同时安装多款游戏，同一款游戏也可能安装多次，所以要进行去重
     // udid+appId+date，表示同一用户同一天同一款游戏多个日志，只保留一个
     val distinctLogDS: Dataset[IndeH5Log] = installDs.dropDuplicates("udid", "appId", "date")

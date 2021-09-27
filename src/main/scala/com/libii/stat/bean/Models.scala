@@ -86,7 +86,7 @@ case class AdLog2 (
                    sceneId: String, //场景值ID
 //                   confVersion: String,
 //                   sessionFlag: Integer,
-                   customDotEvent: String, //自定义打点事件
+//                   customDotEvent: String, //自定义打点事件
                    ip: String,
                    level: String,
                    v1: String,

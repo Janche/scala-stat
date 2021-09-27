@@ -1,12 +1,12 @@
 package com.libii.stat.service
 
-import java.sql.Connection
-import java.util.Properties
-
 import com.libii.stat.bean.IndeH5Log
 import com.libii.stat.util.{JdbcUtil, Utils}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+
+import java.sql.Connection
+import java.util.Properties
 
 object GameRetainService {
 
@@ -56,7 +56,7 @@ object GameRetainService {
    * @param dateStr
    */
   def doRetainCount(sparkSession: SparkSession, dauDF: Dataset[IndeH5Log], props: Properties, dateStr: String) = {
-    val dnuDF: DataFrame = JdbcUtil.executeQuery(sparkSession, JdbcUtil.INDE_H5_DNU)
+    val dnuMysqlDF: DataFrame = JdbcUtil.executeQuery(sparkSession, JdbcUtil.INDE_H5_DNU)
     val dauDF2: DataFrame = dauDF.select("udid", "appId")
     for (n <- Array(1, 2, 3, 4, 5, 6, 7, 14, 30)){
       import sparkSession.implicits._
@@ -78,7 +78,7 @@ object GameRetainService {
         .withColumnRenamed("deviceType", "device_type")
         .withColumnRenamed("groupId", "group_id")
 
-        val result = retainDF.join(dnuDF,
+        val result = retainDF.join(dnuMysqlDF,
           Seq("app_id", "channel", "date", "device_type", "version", "country", "group_id"), "inner")
           .withColumnRenamed("num", "dnu")
           .select("app_id", "channel", "date", "device_type", "version", "country", "group_id", "dnu", "retained_num_" + n)
@@ -103,7 +103,7 @@ object GameRetainService {
             val sql = s"insert into ${JdbcUtil.INDE_H5_RETAIN} " +
               s"( app_id, date, device_type, version, country, channel, group_id, dnu, $retained_num_n) " +
               s"values ('$app_id', '$date', '$device_type', '$version', '$country', '$channel', $group_id, $dnu, $retained_value) " +
-              s"ON DUPLICATE KEY UPDATE dnu = $dnu, ${retained_num_n} = ${retained_value}"
+              s"ON DUPLICATE KEY UPDATE dnu = $dnu, $retained_num_n = $retained_value"
             connection.createStatement().executeUpdate(sql)
           }
         } catch {

@@ -57,7 +57,9 @@ object JdbcUtil {
 
   // 执行mysql 查询
   def executeQuery(spark: SparkSession, tableName: String): DataFrame = {
-    val df = spark.read.jdbc(DATABASE_ADDRESS, tableName, getJdbcProps())
+    val df = spark.read
+      .option("driver", "com.mysql.jdbc.Driver")
+      .jdbc(DATABASE_ADDRESS, tableName, getJdbcProps())
     df
   }
 
@@ -73,7 +75,9 @@ object JdbcUtil {
     val lowerBound = 1
     val upperBound = 100000
     val numPartitions = 5
-    val df = spark.read.jdbc(DATABASE_ADDRESS, INDE_H5_DNU, "date", lowerBound, upperBound, numPartitions, getJdbcProps())
+    val df = spark.read
+      .option("driver", "com.mysql.jdbc.Driver")
+      .jdbc(DATABASE_ADDRESS, INDE_H5_DNU, "date", lowerBound, upperBound, numPartitions, getJdbcProps())
 
     println(df.count())
     println(df.rdd.partitions.foreach(println(_)))
@@ -86,7 +90,9 @@ object JdbcUtil {
    */
   def method4(spark: SparkSession): Unit = {
     val url = "jdbc:mysql://127.0.0.1:3306/test?user=root&password=root"
-    val df = spark.read.format("jdbc").options(Map("url" -> url, "dbtable" -> "t_score")).load()
+    val df = spark.read.format("jdbc")
+      .option("driver", "com.mysql.jdbc.Driver")
+      .options(Map("url" -> url, "dbtable" -> "t_score")).load()
 
     println(df.count())
     println(df.rdd.partitions.size)

@@ -1,18 +1,13 @@
 package com.libii.stat.controller
 
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDateTime, ZoneId}
-import java.util.Date
-
-import com.libii.stat.bean.{AdLog, AdLog2, IndeH5Log}
+import com.libii.stat.bean.{AdLog2, IndeH5Log}
 import com.libii.stat.service.{GameAuService, GameNuService, GameRetainService}
-import com.libii.stat.util.{HiveUtil, JdbcUtil}
-import org.apache
-import org.apache.spark
+import com.libii.stat.util.JdbcUtil
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.desc
 import org.apache.spark.{SparkConf, SparkContext}
+
+import java.text.SimpleDateFormat
+import java.util.Date
 object GameController {
 
   def main(args: Array[String]): Unit = {
@@ -28,6 +23,7 @@ object GameController {
 //      .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
       .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
       .config("apache.spark.debug.maxToStringFields", 1000) // 解决Truncated the string representation of a plan since it was too large
+      .config("spark.scheduler.listenerbus.eventqueue.size", 100000)
       .enableHiveSupport().getOrCreate()
 
     val ssc: SparkContext = sparkSession.sparkContext
@@ -42,7 +38,7 @@ object GameController {
     args(0) = "0"
     for (i <- 0 to args(0).toInt){
       var dateStr2: String = 20210901 + i + ""
-      dateStr2 = "20210925"
+//      dateStr2 = "20210925"
       var sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd")
       val dateTime: Date = sdf.parse(dateStr2)
       sdf = new SimpleDateFormat("'year='yyyy/'month='M/'day='d")
@@ -64,28 +60,21 @@ object GameController {
             groupId = 0
           }
           IndeH5Log(data.udid, data.channel, data.appId, data.timestamp, data.deviceType, data.actionType,
-            data.version, data.country, groupId.toLong, data.userType, data.level, data.customDotEvent, data.sceneId, dateStr2.toInt)
+            data.version, data.country, groupId.toLong, data.userType, data.level, "", data.sceneId, dateStr2.toInt)
         })
       })
-     //    使用map的方式
-      //      {
-      //        val dateStr = dtFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(data.timestamp), ZoneId.systemDefault))
-      //        IndeH5Log(data.udid, data.channel, data.appId, Integer.parseInt(dateStr), data.timestamp, data.deviceType, data.actionType,
-      //          data.version, data.country, data.sessionFlag, data.groupId, data.userType, data.level, data.customDotEvent, data.sceneId)
-      //      }
 
-//      JdbcUtil.executeByCondition(sparkSession, dateStr2)
       h5LogDs.persist()
       // 获取Jdbc参数
       val props = JdbcUtil.getJdbcProps()
       // 日新增
-//      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
+      GameNuService.doDnuCount(sparkSession, props, h5LogDs, dateStr2)
       // 日活跃
       val dauDS: Dataset[IndeH5Log] = GameAuService.doDauCount(sparkSession, props, h5LogDs, dateStr2)
       // 周活跃
-//      GameAuService.doWauCount(sparkSession, props, dateStr2)
+      GameAuService.doWauCount(sparkSession, props, dateStr2)
       // 月活跃
-//      GameAuService.doMauCount(sparkSession, props, dateStr2)
+      GameAuService.doMauCount(sparkSession, props, dateStr2)
 
       GameRetainService.doRetainCount(sparkSession, dauDS, props, dateStr2)
       h5LogDs.unpersist()

@@ -1,11 +1,10 @@
 package com.libii.stat.service
 
-import java.util.Properties
-
 import com.libii.stat.bean.IndeH5Log
-import com.libii.stat.util.date.DateUtils
 import com.libii.stat.util.{Constant, JdbcUtil, Utils}
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SaveMode, SparkSession}
+
+import java.util.Properties
 
 object GameAuService {
 
@@ -31,17 +30,17 @@ object GameAuService {
         |""".stripMargin)
 
     // 去重后的日活保存到hive表
-//    distinctLog.coalesce(1).write.mode(SaveMode.Overwrite)
-////      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
-//      .insertInto("dwd.inde_h5_dau")
+    distinctLog.coalesce(1).write.mode(SaveMode.Overwrite)
+//      .partitionBy("date") // 没有创建表，可通过 partitionBY + saveAsTable 创建表结构 和 插入数据
+      .insertInto("dwd.inde_h5_dau")
 
     // 先删除mysql已存在的数据
-//    JdbcUtil.executeUpdate("delete from " + JdbcUtil.INDE_H5_DAU + " where date = " + dateStr)
+    JdbcUtil.executeUpdate("delete from " + JdbcUtil.INDE_H5_DAU + " where date = " + dateStr)
     // 保存到mysql
-//    result.write
-//      .mode(SaveMode.Append)
-//      .option("driver", "com.mysql.jdbc.Driver")
-//      .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DAU, props)
+    result.write
+      .mode(SaveMode.Append)
+      .option("driver", "com.mysql.jdbc.Driver")
+      .jdbc(JdbcUtil.DATABASE_ADDRESS, JdbcUtil.INDE_H5_DAU, props)
     distinctLog
   }
 

@@ -1,12 +1,15 @@
-package util
+package com.libii.stat.util
 
-import java.io.InputStream
+import java.io.{FileInputStream, InputStream}
 import java.sql.{Connection, PreparedStatement, ResultSet, SQLException, Statement}
 import java.util.Properties
-
 import com.alibaba.druid.pool.DruidDataSourceFactory
+
 import javax.sql.DataSource
 import org.slf4j.LoggerFactory
+
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import com.typesafe.config.{Config, ConfigFactory}
 
 /**
@@ -34,24 +37,32 @@ object DruidUtils {
   }
 
   def main(args: Array[String]): Unit = {
+    val c = ConfigFactory.load("druid.properties")
+    println(c.getString("username"))
+
+    var sql = "select * from inde_h5_dnu_scala limit 3"
     initDataSource()
     val conn = DruidUtils.getConnection
-    val df: PreparedStatement = conn.prepareStatement(s"select * from inde_h5_dnu limit 3")
-    val set: ResultSet = df.getResultSet
-    println(set.getInt("id"))
+    val maps: ListBuffer[mutable.HashMap[String, Any]] = JdbcUtil.executeSelectAll(conn, sql)
+    maps.foreach(println(_))
+    sql = "select * from inde_h5_dnu_scala where date = ? limit 3"
+    JdbcUtil.executeSelectAll(conn, sql, 20210904).foreach(println(_))
+
+    conn.close()
   }
 
   def initDataSource(): Unit = {
     if (dataSource == null) {
       try {
-        val druidProp = new Properties()
-        val config: InputStream = this.getClass.getResourceAsStream("druid.properties")
-        druidProp.load(config)
-        println(druidProp.getProperty("url"))
-        dataSource = DruidDataSourceFactory.createDataSource(druidProp)
+        val stream: InputStream = this.getClass.getClassLoader.getResourceAsStream("druid.properties")
+        val confPath = Thread.currentThread().getContextClassLoader.getResource("druid.properties").getPath
+        val prop: Properties = new Properties()
+//        prop.load(new FileInputStream(confPath))
+        prop.load(stream)
+        dataSource = DruidDataSourceFactory.createDataSource(prop)
       } catch {
         case e: Exception =>
-          logger.error("初始化连接池失败...", e)
+          logger.error("初始化Druid连接池失败...", e)
       }
     }
   }

@@ -127,9 +127,9 @@ object JdbcUtil {
     val colNumbers = cols.length
     var sqlStr ="insert into"+ tableName +"values("
     for(i <- 1 to colNumbers){
-      sqlStr +="?"
+      sqlStr += "?"
       if(i != colNumbers){
-        sqlStr +=","
+        sqlStr += ","
       }
     }
     sqlStr += ")ON DUPLICATE KEY UPDATE"

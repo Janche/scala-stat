@@ -70,6 +70,7 @@ object GameRetainService {
           | where date = $beforeDateStr
           |""".stripMargin)
           .as[IndeH5Log]
+      // 此处可以right_join，没有join上的设置为0，表示留存日期到了，只是没有留存，用以区分null的留存数
       val retainDF: DataFrame = dauDF2.join(hisDnuLog, Seq("udid", "appId"), "inner")
         .groupBy( "appId", "channel", "date", "deviceType", "version", "country", "groupId")
         .agg(count("udid").as("retained_num_" + n))
@@ -78,10 +79,10 @@ object GameRetainService {
         .withColumnRenamed("deviceType", "device_type")
         .withColumnRenamed("groupId", "group_id")
 
-        val result = retainDF.join(dnuMysqlDF,
-          Seq("app_id", "channel", "date", "device_type", "version", "country", "group_id"), "inner")
-          .withColumnRenamed("num", "dnu")
-          .select("app_id", "channel", "date", "device_type", "version", "country", "group_id", "dnu", "retained_num_" + n)
+      val result = retainDF.join(broadcast(dnuMysqlDF),
+        Seq("app_id", "channel", "date", "device_type", "version", "country", "group_id"), "inner")
+        .withColumnRenamed("num", "dnu")
+        .select("app_id", "channel", "date", "device_type", "version", "country", "group_id", "dnu", "retained_num_" + n)
       val retained_num_n = "retained_num_" + n
 
       result.foreachPartition(data => {

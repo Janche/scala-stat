@@ -22,8 +22,8 @@ object GameController {
 //      .config("hive.exec.dynamic.partition", true) // 支持 Hive 动态分区
 //      .config("hive.exec.dynamic.partition.mode", "nonstrict") // 非严格模式
       .config("spark.sql.sources.partitionOverwriteMode","dynamic") // 只覆盖对应分区的数据
-      .config("apache.spark.debug.maxToStringFields", 1000) // 解决Truncated the string representation of a plan since it was too large
-      .config("spark.scheduler.listenerbus.eventqueue.size", 100000)
+      .config("apache.spark.debug.maxToStringFields", 3000) // 解决Truncated the string representation of a plan since it was too large
+      .config("spark.scheduler.listenerbus.eventqueue.capacity", 100000)
       .enableHiveSupport().getOrCreate()
 
     val ssc: SparkContext = sparkSession.sparkContext

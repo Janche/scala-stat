@@ -5,7 +5,7 @@ import java.util.Properties
 import com.libii.stat.bean.IndeH5Log
 import com.libii.stat.util.{JdbcUtil, Utils}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 object GameRetainService {
 
@@ -59,7 +59,7 @@ object GameRetainService {
   def doRetainCount(sparkSession: SparkSession, dauDF: Dataset[IndeH5Log], props: Properties, dateStr: String) = {
     val dnuMysqlDF: DataFrame = JdbcUtil.executeQuery(sparkSession, JdbcUtil.INDE_H5_DNU)
     val dauDF2: DataFrame = dauDF.select("udid", "appId")
-    val broadcastDnuMysqlDF = broadcast(dnuMysqlDF)
+    val broadcastDnuMysqlDF: Dataset[Row] = broadcast(dnuMysqlDF)
     for (n <- Array(1, 2, 3, 4, 5, 6, 7, 14, 30)) {
       import sparkSession.implicits._
       // 获取多日的历史新增数据
@@ -88,9 +88,7 @@ object GameRetainService {
       val retained_num_n = "retained_num_" + n
 
       result.foreachPartition(partition => {
-//        DruidUtils.initDataSource()
-        val connection = DataSourceUtil.getConnection
-//        val connection = JdbcUtil.getConnection()
+        val connection = JdbcUtil.getConnection
         val statement = connection.createStatement()
         partition.foreach(row => {
           val app_id = row.getAs[String]("app_id")
@@ -108,10 +106,10 @@ object GameRetainService {
             s"ON DUPLICATE KEY UPDATE dnu = $dnu, $retained_num_n = $retained_value"
           statement.executeUpdate(sql)
         })
+
         statement.close()
         connection.close()
       })
     }
   }
-
 }

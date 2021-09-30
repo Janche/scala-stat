@@ -2,11 +2,13 @@ package com.libii.stat.util
 
 import java.sql.{Connection, Date, DriverManager, PreparedStatement, ResultSet, ResultSetMetaData, Statement, Timestamp}
 import java.util.Properties
-import org.apache.spark.sql.types.{BooleanType, ByteType, DateType, DoubleType, FloatType, IntegerType, LongType, ShortType, StringType, TimestampType}
+
+import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+
 
 object JdbcUtil {
 
@@ -43,12 +45,13 @@ object JdbcUtil {
   // 执行mysql 新增、修改和删除
   def executeUpdate(sql: String) = {
     val conn = getConnection()
+//    val conn = DruidUtils.getConnection
     val stmt: Statement = conn.createStatement()
     try {
       stmt.executeUpdate(sql)
     } catch {
       case e: Exception => {
-        println("mysql 操作异常")
+        println(s"mysql 操作异常, $e")
       }
     } finally {
       stmt.close()

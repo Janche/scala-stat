@@ -20,26 +20,26 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
-<!--            <scope>provided</scope>-->
+            <scope>provided</scope>
             <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
-<!--            <scope>provided</scope>-->
+            <scope>provided</scope>
             <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.11</artifactId>
-<!--            <scope>provided</scope>-->
+            <scope>provided</scope>
             <version>${spark.version}</version>
         </dependency>
         <!-- 引入Scala -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-<!--            <scope>provided</scope>-->
+            <scope>provided</scope>
             <version>${scala.version}</version>
         </dependency>
 
@@ -57,8 +57,8 @@
 
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.21</version>
+            <artifactId>druid</artifactId>
+            <version>1.2.4</version>
         </dependency>
 
         <dependency>
